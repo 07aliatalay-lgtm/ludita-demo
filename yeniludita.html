@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ludita AI Asistan Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+  body {
+    background: #faf7f2;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .container {
+    max-width: 420px;
+    width: 100%;
+  }
+  .header-note {
+    text-align: center;
+    margin-bottom: 18px;
+    color: #a8a29a;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .chat-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid #ece6dc;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(30, 25, 20, 0.06);
+  }
+  .chat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #f0ebe3;
+    background: #fcfaf7;
+  }
+  .avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #2c2620;
+    color: #faf7f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.05em;
+  }
+  .header-text p { margin: 0; }
+  .header-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: #2c2620;
+    letter-spacing: 0.03em;
+  }
+  .header-status {
+    font-size: 12px;
+    color: #a8a29a;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 2px;
+  }
+  .dot-online {
+    width: 7px; height: 7px; border-radius: 50%; background: #8fae8a; display: inline-block;
+  }
+  .chat-body {
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 320px;
+    max-height: 420px;
+    overflow-y: auto;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .msg {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 14px;
+  }
+  .bot {
+    align-self: flex-start;
+    background: #f7f3ed;
+    color: #3a3228;
+  }
+  .user {
+    align-self: flex-end;
+    background: #2c2620;
+    color: #faf7f2;
+  }
+  .quick-replies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 20px 16px;
+  }
+  .quick-reply {
+    border: 1px solid #ece6dc;
+    background: #fff;
+    border-radius: 20px;
+    padding: 7px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #3a3228;
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+  }
+  .quick-reply:hover {
+    background: #2c2620;
+    color: #faf7f2;
+    border-color: #2c2620;
+  }
+  .chat-input {
+    display: flex;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid #f0ebe3;
+  }
+  .chat-input input {
+    flex: 1;
+    border: 1px solid #ece6dc;
+    border-radius: 24px;
+    padding: 10px 16px;
+    font-size: 14px;
+    outline: none;
+    background: #fcfaf7;
+  }
+  .chat-input input:focus { border-color: #2c2620; }
+  .chat-input button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: #2c2620;
+    color: #faf7f2;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .chat-input button:hover { background: #4a3f33; }
+  .typing {
+    align-self: flex-start;
+    background: #f7f3ed;
+    border-radius: 14px;
+    padding: 10px 14px;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .typing span {
+    width: 6px; height: 6px; border-radius: 50%; background: #cdc4b6;
+    animation: blink 1.4s infinite both;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
+  }
+  .footer-note {
+    text-align: center;
+    margin-top: 16px;
+    color: #c5beb2;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header-note">Ludita icin hazirlanan ornek asistan</div>
+
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="avatar">L</div>
+      <div class="header-text">
+        <p class="header-title">Ludita Asistan</p>
+        <p class="header-status"><span class="dot-online"></span> Cevrimici</p>
+      </div>
+    </div>
+
+    <div class="chat-body" id="chatBody">
+      <div class="msg bot">Merhaba, ben Ludita asistaniyim. Cilt tipiniz veya ihtiyaciniz hakkinda bana yazabilir, ya da asagidaki hazir sorulardan birini secebilirsiniz.</div>
+    </div>
+
+    <div class="quick-replies" id="quickReplies">
+      <div class="quick-reply" onclick="sendQuick('Kuru cildim icin ne onerirsiniz?')">Kuru cilt onerisi</div>
+      <div class="quick-reply" onclick="sendQuick('Kargo ne kadar surer?')">Kargo bilgisi</div>
+      <div class="quick-reply" onclick="sendQuick('Iade kosullari nedir?')">Iade kosullari</div>
+      <div class="quick-reply" onclick="sendQuick('Hangi urunler vegan?')">Vegan urunler</div>
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Mesajinizi yazin..." onkeypress="if(event.key==='Enter') sendMessage()">
+      <button onclick="sendMessage()" aria-label="Gonder">&#10148;</button>
+    </div>
+  </div>
+
+  <div class="footer-note">Bu demo, ludita.com.tr sitenize entegre<br>edilebilecek bir AI asistanin ornek davranisini gostermektedir.</div>
+</div>
+
+<script>
+const responses = [
+  {
+    keywords: ['kuru', 'nem', 'hyaluronic', 'hyaluronik', 'gergin'],
+    reply: "Kuru ve gergin cilt icin Ludita Pure Hyaluronic Acid Serum'u oneririm. Icerigindeki %2 hyaluronik asit nemi cilde cekip kilitler, B5 vitamini ise cilt bariyerinin onarilmasina yardimci olur. Sabah veya aksam rutininize kolayca eklenebilir, yapiskan hissi birakmaz."
+  },
+  {
+    keywords: ['kirisik', 'yaslanma', 'anti-aging', 'anti aging', 'cizgi'],
+    reply: "Ince cizgiler ve kirisiklik gorunumu icin Ludita Complex Night Care Serum guzel bir secenek. Peptid icerigi sayesinde gece boyunca cildin onarilmasina destek olur, daha dolgun ve siki bir gorunum saglar."
+  },
+  {
+    keywords: ['kargo', 'teslimat', 'ne kadar surer'],
+    reply: "Siparisleriniz ortalama 2-3 is gunu icinde kargoya verilir ve adresinize ulastirilir. Kargo takip numaraniz, siparis onay e-postanizda yer alir."
+  },
+  {
+    keywords: ['iade', 'degisim', 'geri gonder'],
+    reply: "Tum urunlerimizde 30 gun icinde kosulsuz iade hakkiniz bulunmaktadir. Iade talebi icin urunu orijinal ambalajinda saklamaniz ve destek ekibimizle iletisime gecmeniz yeterlidir."
+  },
+  {
+    keywords: ['vegan', 'hayvan testi', 'cruelty'],
+    reply: "Ludita urunlerinin tamami hayvanlar uzerinde test edilmemistir ve buyuk cogunlugu vegan formuldedir. Bir urunun vegan olup olmadigini, urun sayfasindaki icerik listesinden teyit edebilirsiniz."
+  },
+  {
+    keywords: ['fiyat', 'tl', 'ucret', 'kac para'],
+    reply: "Urun fiyatlarimiz kategoriye gore degisiklik gostermektedir. Size en uygun urunu onerdikten sonra, guncel fiyat bilgisini urun sayfasindan kontrol edebilirsiniz."
+  },
+  {
+    keywords: ['merhaba', 'selam', 'iyi gunler'],
+    reply: "Merhaba! Size nasil yardimci olabilirim? Cilt tipinizi soylerseniz urun onerebilirim, ya da kargo/iade gibi sorulariniza yanit verebilirim."
+  }
+];
+
+const fallback = "Bu konuda size en iyi sekilde yardimci olabilmek icin biraz daha detay verebilir misiniz? Ornegin cilt tipiniz (kuru, yagli, karma, hassas) veya merak ettiginiz konu (kargo, iade, urun onerisi) hakkinda yazabilirsiniz.";
+
+function getResponse(text) {
+  const lower = text.toLowerCase();
+  for (const item of responses) {
+    if (item.keywords.some(k => lower.includes(k))) {
+      return item.reply;
+    }
+  }
+  return fallback;
+}
+
+function appendMessage(text, sender) {
+  const body = document.getElementById('chatBody');
+  const div = document.createElement('div');
+  div.className = 'msg ' + sender;
+  div.textContent = text;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function showTyping() {
+  const body = document.getElementById('chatBody');
+  const div = document.createElement('div');
+  div.className = 'typing';
+  div.id = 'typingIndicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+function handleUserMessage(text) {
+  if (!text.trim()) return;
+  appendMessage(text, 'user');
+  document.getElementById('quickReplies').style.display = 'none';
+  showTyping();
+  setTimeout(() => {
+    removeTyping();
+    appendMessage(getResponse(text), 'bot');
+  }, 900);
+}
+
+function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value;
+  input.value = '';
+  handleUserMessage(text);
+}
+
+function sendQuick(text) {
+  handleUserMessage(text);
+}
+</script>
+
+</body>
+</html>
